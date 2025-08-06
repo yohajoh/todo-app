@@ -1,0 +1,95 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Define the database client and provider.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // Or "sqlite", "mysql", "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+/// @map("users")
+model User {
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  name          String?
+  password      String
+  // Lists created by this user
+  ownedLists    TodoList[] @relation("OwnerLists")
+  // Lists this user is a member of (for collaboration)
+  memberOfLists UserOnTodoList[]
+  todos         Todo[]   // A user can have multiple todo items, regardless of list
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+/// Represents a collection of To-Do items, allowing for organization and collaboration.
+/// @map("todo_lists")
+model TodoList {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  // The user who created and owns this list
+  ownerId     Int
+  owner       User     @relation("OwnerLists", fields: [ownerId], references: [id], onDelete: Cascade)
+  todos       Todo[]
+  // Users who have access to this list (for collaboration)
+  members     UserOnTodoList[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+/// Junction table for many-to-many relationship between User and TodoList,
+/// defining user access and roles for collaborative lists.
+/// @map("users_on_todo_lists")
+model UserOnTodoList {
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  todoListId Int
+  todoList   TodoList @relation(fields: [todoListId], references: [id], onDelete: Cascade)
+  assignedAt DateTime @default(now())
+  // Role of the user in the list (e.g., ADMIN, EDITOR, VIEWER)
+  role       Role     @default(EDITOR)
+
+  @@id([userId, todoListId]) // Composite primary key
+}
+
+/// Represents an individual To-Do item.
+/// @map("todos")
+model Todo {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  completed   Boolean  @default(false)
+  // Optional due date for the todo item
+  dueDate     DateTime?
+  // Priority level of the todo item
+  priority    Priority @default(MEDIUM)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // The user who owns this todo item
+  userId      Int      @map("user_id")
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // The TodoList this item belongs to
+  todoListId  Int      @map("todo_list_id")
+  todoList    TodoList @relation(fields: [todoListId], references: [id], onDelete: Cascade)
+}
+
+// Enums for predefined options
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+  VIEWER
+}
