@@ -1,69 +1,7 @@
-// // app/api/todos/[id]/route.ts
-
-// import { NextResponse } from 'next/server';
-// import jwt from 'jsonwebtoken';
-// import { updateTodo, deleteTodo } from '@/lib/actions/todo'; // Import update and delete actions
-
-// const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_very_strong_and_random';
-
-// // ... (existing PUT handler for updating a specific todo item) ...
-
-// // DELETE handler for deleting a specific todo item
-// export async function DELETE(request: Request, { params }: { params: { id: string } }) {
-//   try {
-//     const todoId = parseInt(params.id); // Get todo ID from URL parameters
-//     if (isNaN(todoId)) {
-//       return NextResponse.json({ error: 'Invalid Todo ID' }, { status: 400 });
-//     }
-
-//     const authHeader = request.headers.get('Authorization');
-//     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-//       return NextResponse.json({ error: 'Authorization token required' }, { status: 401 });
-//     }
-
-//     const token = authHeader.split(' ')[1];
-//     let decodedToken: { userId: number; email: string; } | null = null;
-
-//     // Verify the JWT to get the user ID for authorization
-//     try {
-//       decodedToken = jwt.verify(token, JWT_SECRET) as { userId: number; email: string; };
-//     } catch (jwtError) {
-//       console.error('JWT verification failed for DELETE /api/todos/[id]:', jwtError);
-//       return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
-//     }
-
-//     if (!decodedToken || typeof decodedToken.userId !== 'number') {
-//       return NextResponse.json({ error: 'Invalid token payload: userId missing' }, { status: 401 });
-//     }
-
-//     const userId = decodedToken.userId; // Get the user ID from the verified token
-
-//     // Call the deleteTodo action
-//     const result = await deleteTodo(todoId, userId);
-
-//     if (result.success) {
-//       return NextResponse.json({ message: 'Todo deleted successfully!' }, { status: 200 });
-//     } else {
-//       // Handle errors returned by the action (e.g., 'Todo not found or unauthorized')
-//       let statusCode = 500;
-//       if (result.error === 'Todo not found or unauthorized') {
-//         statusCode = 404; // Not Found or Forbidden
-//       }
-//       console.error('Error from deleteTodo action:', result.error);
-//       return NextResponse.json({ error: result.error || 'Failed to delete todo item.' }, { status: statusCode });
-//     }
-
-//   } catch (error) {
-//     console.error('Unexpected error in DELETE /api/todos/[id] route:', error);
-//     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-//   }
-// }
-
-
 
 // app/api/todos/[id]/route.ts
 
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server'; // Import NextRequest
 import jwt from 'jsonwebtoken';
 import { updateTodo, deleteTodo } from '@/lib/actions/todo'; // Import update and delete actions
 
@@ -76,9 +14,14 @@ const JWT_SECRET = process.env.JWT_SECRET || 'f70c6707c5a26b5650b3da2df3d69bfe7e
  * This function receives updated task data and calls the backend action to modify the task in the database.
  * It performs JWT verification for authentication and authorization.
  */
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(
+  request: NextRequest, // First argument is the NextRequest object
+  context: { params: { id: string } } // Second argument is the context object, containing params
+) {
   try {
-    const todoId = parseInt(params.id); // Extract the todo ID from the URL parameters
+    // Destructure 'id' directly from context.params to satisfy the linter/compiler
+    const { id } = context.params;
+    const todoId = parseInt(id); // Use the destructured id
     if (isNaN(todoId)) {
       return NextResponse.json({ error: 'Invalid Todo ID' }, { status: 400 });
     }
@@ -176,9 +119,14 @@ export async function PUT(request: Request, { params }: { params: { id: string }
  * This function handles requests to remove a task from the database.
  * It performs JWT verification for authentication and authorization.
  */
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest, // First argument is the NextRequest object
+  context: { params: { id: string } } // Second argument is the context object, containing params
+) {
   try {
-    const todoId = parseInt(params.id); // Extract the todo ID from the URL parameters
+    // Destructure 'id' directly from context.params to satisfy the linter/compiler
+    const { id } = context.params;
+    const todoId = parseInt(id); // Use the destructured id
     if (isNaN(todoId)) {
       return NextResponse.json({ error: 'Invalid Todo ID' }, { status: 400 });
     }
