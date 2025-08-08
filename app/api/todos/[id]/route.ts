@@ -16,11 +16,11 @@ const JWT_SECRET = process.env.JWT_SECRET || 'f70c6707c5a26b5650b3da2df3d69bfe7e
  */
 export async function PUT(
   request: NextRequest, // First argument is the NextRequest object
-  context: { params: { id: string } } // Second argument is the context object, containing params
+  context: { params: Promise<{ id: string }> } // Second argument is the context object, containing params
 ) {
   try {
     // Destructure 'id' directly from context.params to satisfy the linter/compiler
-    const { id } = context.params;
+    const { id } = await context.params;
     const todoId = parseInt(id); // Use the destructured id
     if (isNaN(todoId)) {
       return NextResponse.json({ error: 'Invalid Todo ID' }, { status: 400 });
@@ -121,11 +121,11 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest, // First argument is the NextRequest object
-  context: { params: { id: string } } // Second argument is the context object, containing params
+  context: { params: Promise<{ id: string }> } // Second argument is the context object, containing params
 ) {
   try {
     // Destructure 'id' directly from context.params to satisfy the linter/compiler
-    const { id } = context.params;
+    const { id } = await context.params;
     const todoId = parseInt(id); // Use the destructured id
     if (isNaN(todoId)) {
       return NextResponse.json({ error: 'Invalid Todo ID' }, { status: 400 });

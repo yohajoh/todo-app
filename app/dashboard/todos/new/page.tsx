@@ -200,7 +200,7 @@ export default function NewTodoPage() {
 
               <div className="grid gap-2">
                 <Label htmlFor="todo-priority">Priority</Label>
-                <Select value={priority} onValueChange={setPriority}>
+                <Select value={priority}>
                   <SelectTrigger id="todo-priority" className="rounded-lg">
                     <SelectValue placeholder="Select priority" />
                   </SelectTrigger>

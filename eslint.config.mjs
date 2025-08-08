@@ -14,3 +14,15 @@ const eslintConfig = [
 ];
 
 export default eslintConfig;
+
+module.exports = {
+  overrides: [
+    {
+      files: ['lib/generated/prisma/wasm.js'],
+      rules: {
+        '@typescript-eslint/no-unused-vars': 'off',
+        '@typescript-eslint/no-require-imports': 'off',
+      },
+    },
+  ],
+};

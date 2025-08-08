@@ -877,7 +877,7 @@ export default function AllMyTasksPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="edit-priority">Priority</Label>
-              <Select value={editPriority} onValueChange={setEditPriority}>
+              <Select value={editPriority}>
                 <SelectTrigger id="edit-priority" className="w-full rounded-lg">
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
